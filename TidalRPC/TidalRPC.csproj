@@ -10,10 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -33,6 +29,15 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DiscordRPC">
+      <HintPath>..\..\..\..\Downloads\discord-rpc-csharp-master\discord-rpc-csharp-master\DiscordRPC\bin\Release\net35\DiscordRPC.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore">
+      <HintPath>..\..\..\..\..\..\Windows\Microsoft.NET\Framework\v4.0.30319\WPF\PresentationCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

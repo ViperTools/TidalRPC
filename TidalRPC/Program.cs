@@ -14,7 +14,7 @@ namespace TidalRPC
         private static Process p;
         private static string songName = "";
         private static string songAuthor = "";
-        private static DiscordRpcClient rpcClient = new("923066535449354240");
+        private static DiscordRpcClient rpcClient = new("955240746305327104");
         private static string tidalToken;
 
         [DllImport("kernel32.dll")]
@@ -40,6 +40,7 @@ namespace TidalRPC
             ApplicationConfiguration.Initialize();
             ContextMenuStrip cms = new();
             System.ComponentModel.Container components = new();
+
             NotifyIcon trayIcon = new NotifyIcon()
             {
                 Icon = Properties.Resources.TidalIcon,
@@ -47,6 +48,7 @@ namespace TidalRPC
                 Text = "Tidal RPC",
                 Visible = true
             };
+
             cms.Items.Add("Exit", null, delegate
             {
                 Application.Exit();
@@ -96,23 +98,17 @@ namespace TidalRPC
             if (p.MainWindowTitle == "TIDAL")
             {
                 songName = songAuthor = "";
-                rpcClient.SetPresence(new()
-                {
-                    Details = "Paused",
-                    Assets = new Assets
-                    {
-                        LargeImageKey = "tidalrpc"
-                    }
-                });
+                rpcClient.UpdateSmallAsset("paused", "Paused");
                 return;
             }
 
             if (p.MainWindowTitle.LastIndexOf("-") < 0) return;
+
             string name = p.MainWindowTitle.Substring(0, p.MainWindowTitle.LastIndexOf("-")).Trim();
             string author = p.MainWindowTitle.Substring(p.MainWindowTitle.LastIndexOf("-") + 1).Trim();
+
             if (name != songName || songAuthor != author)
             {
-                // Create the presence object
                 RichPresence presence = new()
                 {
                     Details = name,
@@ -123,26 +119,38 @@ namespace TidalRPC
                     },
                     Assets = new Assets
                     {
-                        LargeImageKey = "tidalrpc"
+                        LargeImageKey = "tidalrpc",
+                        LargeImageText = "Tidal"
                     }
                 };
                 
-                // Get URL of song and create listen button
                 SearchResponse? search = Api.Search(tidalToken, new()
                 {
                     Query = p.MainWindowTitle
                 });
+
                 if (search?.Tracks.Items.Length > 0)
                 {
+                    Track track = search.Tracks.Items[0];
+
+                    presence.Assets = new()
+                    {
+                        LargeImageKey = $"https://resources.tidal.com/images/{track.Album.Cover.Replace('-', '/')}/1280x1280.jpg",
+                        LargeImageText = track.Album.Title,
+                        SmallImageKey = "tidalrpc",
+                        SmallImageText = "Tidal"
+                    };
+
                     presence.Buttons = new DiscordRPC.Button[]
                     {
                         new DiscordRPC.Button
                         {
                             Label = "Listen",
-                            Url = search.Tracks.Items[0].Url
+                            Url = track.Url
                         }
                     };
                 }
+
                 rpcClient.SetPresence(presence);
             }
             songName = name;
